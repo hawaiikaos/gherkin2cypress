@@ -1,9 +1,9 @@
-var fs = require('fs');
-var filePath = process.argv[2];
+const fs = require('fs');
+const filePath = process.argv[2];
 var output = '';
 
 function writeStep(line, stepType) {
-	var step = line.replace(stepType, '').trim();
+	const step = line.replace(stepType, '').trim();
 	output = output + `${stepType}("${step}", () => {
 	return true;
 });
@@ -18,13 +18,13 @@ function writeHeader(line) {
 }
 
 function writeOutput() {
-	var filename = filePath.split('/').pop();
-	var path = filePath.split('/').slice(0, -1).join('/');
-	var newPath = filePath.split('/').slice(0, -1).join('/') + '/' + filename.replace('.feature', '');
+	const filename = filePath.split('/').pop();
+	const path = filePath.split('/').slice(0, -1).join('/');
+	const newPath = filePath.split('/').slice(0, -1).join('/') + '/' + filename.replace('.feature', '');
 	try {
 	  	if (!fs.existsSync(newPath)) {
 	  		fs.mkdir(newPath, function() {
-	  			var outputFilePath = newPath + '/' + filename.replace('.feature','.js');
+	  			const outputFilePath = newPath + '/' + filename.replace('.feature','.js');
 	  			fs.writeFile(outputFilePath, output, function(err) {
 	  				if(err) {
 	  		        	return console.log(err);
@@ -43,8 +43,8 @@ function writeOutput() {
 }
 
 fs.readFile(filePath, 'utf8', (err, data) => {
-     if (err) throw err;
-	lines = data.match(/[^\r\n]+/g);
+	if (err) throw err;
+	const lines = data.match(/[^\r\n]+/g);
 	lines.forEach(function(l) {
 		l = l.trim();
 		if (l.match(/^@/)) {
