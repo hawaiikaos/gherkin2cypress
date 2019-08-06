@@ -1,8 +1,6 @@
 var fs = require('fs');
 var filePath = process.argv[2];
 var output = '';
-var outputFilePath = filePath.replace('.feature','.js');
-
 
 function writeStep(line, stepType) {
 	var step = line.replace(stepType, '').trim();
@@ -20,11 +18,28 @@ function writeHeader(line) {
 }
 
 function writeOutput() {
-	fs.writeFile(outputFilePath, output, function(err) {
-		if(err) {
-	        return console.log(err);
-	    }
-	});
+	var filename = filePath.split('/').pop();
+	var path = filePath.split('/').slice(0, -1).join('/');
+	var newPath = filePath.split('/').slice(0, -1).join('/') + '/' + filename.replace('.feature', '');
+	try {
+	  	if (!fs.existsSync(newPath)) {
+	  		fs.mkdir(newPath, function() {
+	  			var outputFilePath = newPath + '/' + filename.replace('.feature','.js');
+	  			fs.writeFile(outputFilePath, output, function(err) {
+	  				if(err) {
+	  		        	return console.log(err);
+	  		    	} else {
+	  		    		console.log(outputFilePath + ' created.');
+	  		    	}
+	  			});
+	  		});
+	  	} else {
+			// folder already exists, don't overwrite
+	  		console.log('Feature file folder already exists. Remove the folder and retry. Exiting.');
+	  	}
+	} catch(err) {
+		console.error(err);
+	}
 }
 
 fs.readFile(filePath, 'utf8', (err, data) => {
@@ -50,3 +65,4 @@ fs.readFile(filePath, 'utf8', (err, data) => {
 	});
 	writeOutput();
  });
+
