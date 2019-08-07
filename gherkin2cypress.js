@@ -1,6 +1,8 @@
 const fs = require('fs');
 const filePath = process.argv[2];
-var output = '';
+var output = `import { Given, Then, When } from "cypress-cucumber-preprocessor/steps";
+
+`;
 
 function writeStep(line, stepType) {
 	const step = line.replace(stepType, '').trim();
