@@ -4,21 +4,37 @@ var output = `import { Given, Then, When } from "cypress-cucumber-preprocessor/s
 
 `;
 
+let cache = {
+    "Given": [],
+    "When": [],
+    "Then": [],
+    "And": []
+}
 function writeStep(line, stepType) {
-    const step = line.replace(stepType, '').trim();
-    output = output + `${stepType}("${step}", () => {
-    return true;
+    let step = line.replace(stepType, '').trim();
+    const arg = /".*"/.test(step) ? "text" : "";
+    step = step.replace(/".*"/, '{string}');
+    if ( cacheStep(stepType, step) ) {
+        output = output + `${stepType}("${step}", (${arg}) => {
+    
 });
 
 `
+    }
 }
-
+function cacheStep(stepType, step) {
+    if ( cache[stepType].indexOf(step) !== -1 ) {
+        return false;
+    } else {
+        cache[stepType].push(step);
+        return true;
+    }
+    return false;
+}
 function writeHeader(line) {
     output = output + `// ${line}
-
 `;
 }
-
 function writeOutput() {
     const filename = filePath.split('/').pop();
     const path = filePath.split('/').slice(0, -1).join('/');
@@ -43,7 +59,6 @@ function writeOutput() {
         console.error(err);
     }
 }
-
 fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) throw err;
     const lines = data.match(/[^\r\n]+/g);
@@ -59,11 +74,10 @@ fs.readFile(filePath, 'utf8', (err, data) => {
         } else if (l.match(/^Given/)) {
             writeStep(l, 'Given');
         } else if (l.match(/^And/)) {
-            writeStep(l, 'Then');
+            writeStep(l, 'And');
         } else {
             // something else
         }
     });
     writeOutput();
- });
-
+});
