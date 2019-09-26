@@ -38,7 +38,10 @@ function writeHeader(line) {
 function writeOutput() {
     const filename = filePath.split('/').pop();
     const path = filePath.split('/').slice(0, -1).join('/');
-    const newPath = filePath.split('/').slice(0, -1).join('/') + '/' + filename.replace('.feature', '');
+    let newPath = filePath.split('/').slice(0, -1).join('/') + '/' + filename.replace('.feature', '');
+    if (path === '') {
+        newPath = '.' + newPath;
+    }
     try {
         if (!fs.existsSync(newPath)) {
             fs.mkdir(newPath, function() {
